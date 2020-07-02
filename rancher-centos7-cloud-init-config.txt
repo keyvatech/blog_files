@@ -1,0 +1,27 @@
+#cloud-config
+final_message: "cloud-init completed after $UPTIME seconds and finished at: $TIMESTAMP"
+# Uncomment to log all command output to a file
+#output: {all: '| tee -a /var/log/cloud-init-output.log'}
+runcmd:
+- /usr/bin/firewall-offline-cmd --add-port=22/tcp
+- /usr/bin/firewall-offline-cmd --add-port=80/tcp
+- /usr/bin/firewall-offline-cmd --add-port=443/tcp
+- /usr/bin/firewall-offline-cmd --add-port=2376/tcp
+- /usr/bin/firewall-offline-cmd --add-port=2379/tcp
+- /usr/bin/firewall-offline-cmd --add-port=2380/tcp
+- /usr/bin/firewall-offline-cmd --add-port=4789/udp #VXLAN for flannel
+- /usr/bin/firewall-offline-cmd --add-port=6443/tcp
+- /usr/bin/firewall-offline-cmd --add-port=8472/udp
+- /usr/bin/firewall-offline-cmd --add-port=9099/tcp
+- /usr/bin/firewall-offline-cmd --add-port=10250/tcp
+- /usr/bin/firewall-offline-cmd --add-port=10254/tcp
+- /usr/bin/firewall-offline-cmd --add-port=30000-32767/tcp
+- /usr/bin/firewall-offline-cmd --add-port=30000-32767/udp
+- /bin/systemctl enable firewalld
+- /bin/systemctl start firewalld
+- /usr/bin/firewall-cmd --reload
+- echo -e 'net.bridge.bridge-nf-call-ip6tables = 1\nnet.bridge.bridge-nf-call-iptables = 1\n'>/etc/sysctl.d/10-rancher.conf
+- sysctl --system
+bootcmd:
+- sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+- setenforce 0

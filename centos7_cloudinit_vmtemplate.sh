@@ -1,6 +1,9 @@
 #!/bin/bash
 yum update --skip-broken -y
 yum install -y cloud-init wget open-vm-tools
+# You may wish to remove this if your org requires selinux
+# Kubernetes may require additional configuration for enforcing mode
+sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 /sbin/service rsyslog stop
 /sbin/service auditd stop
 package-cleanup --oldkernels --count=1
