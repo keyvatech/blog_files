@@ -3,20 +3,25 @@ final_message: "cloud-init completed after $UPTIME seconds and finished at: $TIM
 # Uncomment to log all command output to a file
 #output: {all: '| tee -a /var/log/cloud-init-output.log'}
 runcmd:
+# Needed by worker nodes only
 - /usr/bin/firewall-offline-cmd --add-port=22/tcp
+# Needed by control and worker nodes
 - /usr/bin/firewall-offline-cmd --add-port=80/tcp
 - /usr/bin/firewall-offline-cmd --add-port=443/tcp
-- /usr/bin/firewall-offline-cmd --add-port=2376/tcp
-- /usr/bin/firewall-offline-cmd --add-port=2379/tcp
-- /usr/bin/firewall-offline-cmd --add-port=2380/tcp
-- /usr/bin/firewall-offline-cmd --add-port=4789/udp #VXLAN for flannel
-- /usr/bin/firewall-offline-cmd --add-port=6443/tcp
-- /usr/bin/firewall-offline-cmd --add-port=8472/udp
-- /usr/bin/firewall-offline-cmd --add-port=9099/tcp
-- /usr/bin/firewall-offline-cmd --add-port=10250/tcp
 - /usr/bin/firewall-offline-cmd --add-port=10254/tcp
 - /usr/bin/firewall-offline-cmd --add-port=30000-32767/tcp
 - /usr/bin/firewall-offline-cmd --add-port=30000-32767/udp
+# Needed by all nodes
+- /usr/bin/firewall-offline-cmd --add-port=2376/tcp
+- /usr/bin/firewall-offline-cmd --add-port=4789/udp #VXLAN for flannel
+- /usr/bin/firewall-offline-cmd --add-port=8472/udp
+- /usr/bin/firewall-offline-cmd --add-port=9099/tcp
+- /usr/bin/firewall-offline-cmd --add-port=10250/tcp
+# Needed by etcd nodes only
+- /usr/bin/firewall-offline-cmd --add-port=2379/tcp
+- /usr/bin/firewall-offline-cmd --add-port=2380/tcp
+# Needed by control nodes only
+- /usr/bin/firewall-offline-cmd --add-port=6443/tcp
 - /bin/systemctl enable firewalld
 - /bin/systemctl start firewalld
 - /usr/bin/firewall-cmd --reload
